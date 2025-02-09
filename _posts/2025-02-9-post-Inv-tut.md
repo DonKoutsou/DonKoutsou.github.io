@@ -1,5 +1,5 @@
 ---
-title: "Post: Standard"
+title: "Inventory Tutorial"
 excerpt_separator: "<!--more-->"
 categories:
   - Blog
