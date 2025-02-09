@@ -2,11 +2,9 @@
 title: "Inventory Tutorial"
 excerpt_separator: "<!--more-->"
 categories:
-  - Blog
+  - Tutorial
 tags:
-  - Post Formats
-  - readability
-  - standard
+  - Tutorial
 link: https://github.com/DonKoutsou/Inventory_Tutorial
 Gameic : https://game-icons.net/
 ---
@@ -410,5 +408,361 @@ func _on_item_area_area_entered(area: Area2D) -> void:
 	else : if (area.get_parent() is Interactable):
 		Interactables.append(area.get_parent())
 ```
+Θα φτιάξουμε μια σκηνή που όλα θα υπάρξουν μαζί και την ονομάζουμε World (Κόσμος).
 
-<img src="/assets/images/OptionMenuGif.gif" alt="Alt text" width="600" />
+<img src="/assets/images/WorldH.gif" alt="Alt text" width="600" />
+
+Το script του κόσμου θα έχει μια βασική λογική για να έχουμε ένα καλό περιβάλλον να τεστάρουμε το inventory. Θα το βάλουμε να μας κάνει spawn 10 αντικείμενα και να τα μοιράσει γύρο.
+
+```gdscript
+extends Control
+
+class_name World
+
+@export var ItemScene : PackedScene
+
+@export var ItemsToSpread : Array[Item] = []
+
+func _ready() -> void:
+	var Viewportsize = get_viewport_rect().size
+	for g in 10:
+		var ItRes = ItemsToSpread.pick_random()
+		var It = ItemScene.instantiate() as Item2D
+		It.SetItem(ItRes)
+		add_child(It)
+		It.position = Vector2(randf_range(0, Viewportsize.x), randf_range(0, Viewportsize.y))
+```
+
+Όλα φαίνεται να λειτουργούν σωστά, τα αντικείμενα αφαιρούνται από τον κόσμο, εισέρχονται στο inventory, το καθένα στην δικιά του στοίβα και το UI ενημερώνεται σωστά.
+
+<img src="/assets/images/PickUpGif.gif" alt="Alt text" width="600" />
+
+Με το inventory πλήρως λειτουργικό θα κάνουμε implement τα τελευταία κομμάτια του design.
+-Αντικείμενα με περιεχόμενα (μπουκάλι νερό)
+-Menu επιλογών για την κάθε στοίβα.
+
+Πρώτα θα κάνουμε την λίστα επιλογών. Θα χρειαστούμε για αρχή να μπορούμε να διαλέγουμε τα διαφορετικά UI container τις κάθε στήβας
+Για αρχή θα φτιάξουμε την λίστα με τις επιλογές. Χρειαζόμαστε μια απλή λιστα με κουμπιά που θα μας λέει πιο αντικείμενο έχουμε διαλεγμένο και να μας δίνει όλας τις πιθανές επιλογές.
+<img src="/assets/images/ItemOptions.jpg" alt="Alt text" width="600" />
+
+Θα φτιάξουμε ένα panel container για background και θα στιχίσουμε κατακόρυφα το label για τον όνομα του αντικειμένου με όλα τα κουμπιά. Θα φτιάξουμε μια 
+ Κλάση που θα κρατάει όλα τα event για τα κουμπιά και θα ενημερώνει το UI οταν πατιέται κάποια επιλογή. Θα συνδέσουμε όλα τα “pressed” signal από τα κουμπιά και θα προγραμματίσουμε την λογική.
+
+```gdscript
+extends PanelContainer
+
+class_name UIItemOptions
+
+@export var ItemNameLabel : Label
+
+signal OnItemUsed()
+signal OnItemInspected()
+signal OnItemDroped()
+signal OnItemConsumed()
+
+func _ready() -> void:
+	visible = false
+
+func SetSelectedItem(It : Item) -> void:
+	visible = true
+	ItemNameLabel.text = It.GetItemName()
+
+func _on_use_button_pressed() -> void:
+	OnItemUsed.emit()
+
+
+func _on_inspect_button_pressed() -> void:
+	OnItemInspected.emit()
+
+
+func _on_consume_button_pressed() -> void:
+	OnItemConsumed.emit()
+
+
+func _on_drop_button_pressed() -> void:
+	OnItemDroped.emit()
+
+
+func _on_cancel_button_pressed() -> void:
+	visible = false
+```
+Θα περνάμε το αντικείμενο που μόλις διαλέχτηκε για να βάζουμε το όνομα του στο label. Θα δημιουργήσουμε όλα τα signal για το κάθε κουμπί και θα τα τοποθετήσουμε στα σωστά function που έρχονται από τα κουμπιά. Η λογική του τι θα γίνεται όταν πατάμε το κάθε κουμπί θα μπει στο InventoryScreen που θα επικοινωνεί κατευθείαν με το Inventory system.
+
+Θα χρειαστούν κάποιες αλλαγές στα UI που φτιάξαμε μέχρι τώρα.
+{: .notice}
+
+<img src="/assets/images/InventoryContainerButton.jpg" alt="Alt text" width="600" />
+
+Στο UIInventoryContainer θα βάλουμε ένα κουμπί και θα περάσουμε το event “pressed” στην κλάση η οποία με την σειρά της θα κάνει emit το καινούριο signal που θα τοποθετήσουμε στο οποίο θα κάνουμε connect από το InventoryScreen.
+Μία ακόμη αλλαγή είναι ότι κρατάμε referance του InventoryItemContainer για να δημιουργήσουμε το function “GetContainedItem”, αυτή την πληροφορία θα την χρειαστούμε οταν το συγκεκριμένο container διαλεχτεί.
+Εδώ πρέπει να σιγουρευτούμε οτι όλα τα υπόλοιπα element στην ιεραρχία αυτής της σκηνής έχουν το “mouse filter” τους στο ignore έτσι ώστε το κουμπί που βάλαμε να μπορεί να πατηθεί.
+
+
+```gdscript
+extends PanelContainer
+
+class_name InventoryUIContainer
+
+@export var Icon : TextureRect
+@export var ItemAmmount : Label
+@export var ItemName : Label
+
+var _ItemCont : InventoryItemContainer
+
+signal OnContainerSelected
+
+func RegisterContainer(Cont : InventoryItemContainer) -> void:
+	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+	Cont.connect("OnContainerEmptied", DeleteSelf)
+	_ItemCont = Cont
+	ItemAmmount.text = var_to_str(Cont.GetAmmount())
+	ItemName.text = Cont.GetContainedItem().GetItemName()
+	Icon.texture = Cont.GetContainedItem().GetItemIcon()
+
+func OnAmmountUpdated(Amm : int) -> void:
+	ItemAmmount.text = var_to_str(Amm)
+
+func GetContainer() -> InventoryItemContainer:
+	return _ItemCont
+
+func _on_select_button_pressed() -> void:
+	OnContainerSelected.emit()
+```
+
+Στην  γραμμή 22 συνδεόμαστε στο signal και κάνουμε “bind” το ίδιο το container ώστε να μας επιστρέψει όταν καλεστεί το “OnItemContainerSelected”.
+Όταν γίνει αυτό πηγαίνουμε στο InventoryOption panel που φτιάξαμε και του δίνουμε το αντικείμενο του container χρησιμοποιώντας το “GetContainedItem” function που μόλις φτιάξαμε.
+Σιγουρευόμαστε οτι αποθηκεύουμε το reference του διαλεγμένου container για να το χρησιμοποιήσουμε όταν μία επιλογή επιλεχθεί.
+```gdscript
+extends Control
+
+class_name InventoryScreen
+
+@export var WeightText : Label
+@export var ContainerPlacement : Control
+@export var ItemOptions : UIItemOptions
+@export var InventoryContainerScene : PackedScene
+@export var Inv : Inventory
+@export var InventoryDescriptorScene : PackedScene
+
+var SelectedContainer : InventoryItemContainer
+
+func _ready() -> void:
+	Inv.connect("ContainerCreated", OnContainerCreated)
+	Inv.connect("OnWeightChanged", OnWeightUpdated)
+	OnWeightUpdated(Inv.GetCurrentWeight())
+
+func OnContainerCreated(Cont : InventoryItemContainer) -> void:
+	var UIContainer = InventoryContainerScene.instantiate() as InventoryUIContainer
+	UIContainer.RegisterContainer(Cont)
+	ContainerPlacement.add_child(UIContainer)
+	UIContainer.connect("OnContainerSelected", OnItemContainerSelected.bind(UIContainer))
+
+func OnWeightUpdated(NewW : float) -> void:
+	WeightText.text = "Weight : {0} / {1}".format([NewW, Inv.MaxWeight])
+
+func _input(event: InputEvent) -> void:
+	if (event.is_action_pressed("Inventory")):
+		visible = !visible
+
+func OnItemContainerSelected(ItemContainer : InventoryUIContainer) -> void:
+	SelectedContainer = ItemContainer.GetContainer()
+	ItemOptions.SetSelectedItem(SelectedContainer.GetContainedItem())
+```
+
+Τώρα που το menu είναι στημένο θα αρχίσουμε να ορίζουμε μία μία τις διαφορετικές επιλογές που έχουμε βάλει στο design.
+Το OnItemUsed θα περιμένει λίγο γιατι θα πρέπει να ορίσουμε κάτι για να χρησιμοποιηθεί επάνω πρώτα.
+Το OnItemInspected θα χρειαστεί UI
+Το OnItemConsumed θα χρειαστεί να ορίσουμε μερικά stat επάνω στον χαρακτήρα οπότε είναι και αυτό λίγο δουλειά.
+Το OnItemDroped είναι το πιο εύκολο για τώρα. Θα χρειαστεί να κάνουμε κάποιες αλλαγές στο inventory για να μπορούμε να αφαιρέσουμε πράματα.
+
+```gdscript
+func OnItemUsed() -> void:
+	pass
+
+func OnItemInspected() -> void:
+	pass
+
+func OnItemConsumed() -> void:
+	pass
+
+func OnItemDroped() -> void:
+	pass
+```
+
+Η αλλαγές που θα χρειαστεί το inventory είναι απλές, θα χρειαστούμε έναν τρόπο να βγάζουμε αντικείμενα από μέσα του. 
+Στην αρχή ορίσαμε ένα function για να βάζουμε αντικείμενα τώρα ήρθε η ώρα για το αντίθετο.
+Για να γίνει αυτό θα κάνουμε μερικές προετοιμασίες.
+
+```gdscript
+func OnItemAdded(It : Item) -> void:
+	_CurrentWeight += It._ItemWeight
+	OnWeightChanged.emit(_CurrentWeight)
+
+func OnItemRemoved(It : Item) -> void:
+	_CurrentWeight -= It._ItemWeight
+	OnWeightChanged.emit(_CurrentWeight)
+```
+
+Πρώτον θα ετοιμάσουμε το OnItemRemoved μέσα στο Inventory, για να αλλάζουμε το βάρος ενημερώνουμε το UI οτι το βάρος άλλαξε.
+Το επόμενο είναι οτι θα πρέπει να ετοιμαστεί η λογική του της διαγραφής ενός container. Θα πρέπει να ενημερώνουμε το UI οτι κάτι τέτοιο έγινε για να διαγράφει και αυτό τα δικά του container.
+
+
+Ο τρόπος που θα το κάνουμε είναι οτι θα δημιουργήσουμε ένα signal μέσα στο container όπου το UIContainer θα εγγραφεί, και όταν το signal καλεστεί το UI θα διαγράψει τον εαυτό του.
+
+```gdscript
+extends Resource
+
+class_name InventoryItemContainer
+
+var _StoredItem : Item
+var _Ammount : int = 0
+
+signal OnAmmountUpdated(NewAmmount : int)
+signal OnContainerEmptied
+
+func RegisterItem(It : Item) -> void:
+	_StoredItem = It
+
+func UpdateAmm(Amm : int) -> void:
+	_Ammount += Amm
+	OnAmmountUpdated.emit(_Ammount)
+
+func GetAmmount() -> int:
+	return _Ammount
+	
+func GetContainedItem() -> Item:
+	return _StoredItem
+
+func ContainerRemoved() -> void:
+	OnContainerEmptied.emit()
+```
+
+```gdscript
+extends PanelContainer
+
+class_name InventoryUIContainer
+
+@export var Icon : TextureRect
+@export var ItemAmmount : Label
+@export var ItemName : Label
+
+var _ItemCont : InventoryItemContainer
+
+signal OnContainerSelected
+
+func RegisterContainer(Cont : InventoryItemContainer) -> void:
+	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+	Cont.connect("OnContainerEmptied", DeleteSelf)
+	_ItemCont = Cont
+	ItemAmmount.text = var_to_str(Cont.GetAmmount())
+	ItemName.text = Cont.GetContainedItem().GetItemName()
+	Icon.texture = Cont.GetContainedItem().GetItemIcon()
+
+func OnAmmountUpdated(Amm : int) -> void:
+	ItemAmmount.text = var_to_str(Amm)
+
+func GetContainer() -> InventoryItemContainer:
+	return _ItemCont
+
+func _on_select_button_pressed() -> void:
+	OnContainerSelected.emit()
+
+func DeleteSelf() -> void:
+	queue_free()
+```
+
+Μετά από αυτά τα βήματα θα στήσουμε το RemoveItem function χρησιμοποιώντας ότι ετοιμάσαμε μόλις.
+Το function μας θα στηθεί κάπως έτσι.
+
+```gdscript
+func RemoveItemFromContainer(Cont : InventoryItemContainer) -> void:
+	Cont.UpdateAmm(-1)
+	OnItemDropped.emit(Cont.GetContainedItem())
+	OnItemRemoved(Cont.GetContainedItem())
+	if (Cont.GetAmmount() == 0):
+		_InventoryContents.erase(Cont)
+		Cont.ContainerRemoved()
+```
+
+Το container που θα είναι διαλεγμένο εκείνη την στιγμή που ο παίκτης πατήσει το Drop Item θα περαστεί σε αυτό το function, η ποσότητα του container θα μειωθεί, μετά θα καλέσουμε το OnItemRemoved για να ενημερωθεί το βάρος και τέλος κοιτάμε αν το container είναι άδειο, αν ναι τότε βάζουμε μπρός την διαδικασία διαγραφής του.
+Σιγουρευόμαστε ότι το καινούριο function καλείτε όταν πατηθεί το κουμπί μέσα στο OnItemDroped μέσα στο InventoryScreen.
+
+```gdscirpt
+func OnItemDroped() -> void:
+	Inv.RemoveItemFromContainer(SelectedContainer)
+```
+
+Όπως μπορούμε να δούμε καταφέρνουμε επιτυχώς να αφαιρέσουμε το αντικείμενο από το inventory αλλά παρατηρούμε ένα “bug” όταν η στοίβα αδειάσει τα option μένουν ακόμη ανοιχτά. Αυτό μπορεί να προκαλέσει περαιτέρω προβλήματα μιάς και τα κουμπιά θα προσπαθούν να εκτελέσουν επιλογές σε container που δεν υπάρχουν πια.
+
+<img src="/assets/images/DropOption.gif" alt="Alt text" width="600" />
+
+Για να λυθεί αυτό θα χρειαστεί το διαλεγμένο UIcontainer να ενημερώνει το InventoryScreen ότι επρόκειτο να διαγράψει τον εαυτό του και με την σειρά του το Inventory Screen να κλείνει το menu με τα option.
+
+```gdscript
+extends PanelContainer
+
+class_name InventoryUIContainer
+
+@export var Icon : TextureRect
+@export var ItemAmmount : Label
+@export var ItemName : Label
+
+var _ItemCont : InventoryItemContainer
+
+signal OnContainerSelected
+signal OnContainerDeselected
+
+func RegisterContainer(Cont : InventoryItemContainer) -> void:
+	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+	Cont.connect("OnContainerEmptied", DeleteSelf)
+	_ItemCont = Cont
+	ItemAmmount.text = var_to_str(Cont.GetAmmount())
+	ItemName.text = Cont.GetContainedItem().GetItemName()
+	Icon.texture = Cont.GetContainedItem().GetItemIcon()
+
+func OnAmmountUpdated(Amm : int) -> void:
+	ItemAmmount.text = var_to_str(Amm)
+
+func GetContainer() -> InventoryItemContainer:
+	return _ItemCont
+
+func _on_select_button_pressed() -> void:
+	OnContainerSelected.emit()
+
+func DeleteSelf() -> void:
+	OnContainerDeselected.emit()
+	queue_free()
+```
+Ορίζουμε λοιπόν το signal και το καλούμε στο DeleteSelf function.
+Και τέλος ενημερώνουμε το OnItemContainerSelected έτσι ώστε να συνδέεται στο signal από το container που είναι διαλεγμένο, θα πρέπει να θυμόμαστε να ξε-συνδέουμε το signal όταν αλλάζουμε διαλεγμένο container και όταν ένα αντικείμενο ξε-διαλεχτεί.
+
+```gdscript
+func OnItemContainerSelected(ItemContainer : InventoryUIContainer) -> void:
+	if (SelectedContainer != null):
+		SelectedContainer.disconnect("OnContainerEmptied", OnItemContainerDeselected)
+	SelectedContainer = ItemContainer.GetContainer()
+	SelectedContainer.connect("OnContainerEmptied", OnItemContainerDeselected)
+	ItemOptions.SetSelectedItem(SelectedContainer.GetContainedItem())
+
+func OnItemContainerDeselected() -> void:
+	SelectedContainer.disconnect("OnContainerEmptied", OnItemContainerDeselected)
+	SelectedContainer = null
+	ItemOptions.visible = false
+```
+
+Το επόμενο βήμα είναι το Inspect, θα ετοιμάσουμε για αυτό το UI για αρχή και μετά θα δούμε πως θα το αναλύσουμε. Θα γίνει κάτι παρόμοιο με το options menu οπότε η εμπειρία θα μας είναι πολύτιμη. Θα χρειαστούμε κάτι απλό, 2 label για το όνομα του αντικειμένου και την περιγραφή, Ενα TextureRect για το εικονίδιο του, και ένα κουμπί για να κλείνουμε το παράθυρο.  
+
+<img src="/assets/images/DropOption.gif" alt="Alt text" width="600" />
+
+```gdscript
+extends Control
+
+class_name InventoryScreen
+
+@export var WeightText : Label
+@export var ContainerPlacement : Control
+@export var ItemOptions : UIItemOptions
+@export var InventoryContainerScene : PackedScene
+@export var Inv : Inventory
+@export var InventoryDescriptorScene : PackedScene
+```
