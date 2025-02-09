@@ -687,7 +687,7 @@ func RemoveItemFromContainer(Cont : InventoryItemContainer) -> void:
 Το container που θα είναι διαλεγμένο εκείνη την στιγμή που ο παίκτης πατήσει το Drop Item θα περαστεί σε αυτό το function, η ποσότητα του container θα μειωθεί, μετά θα καλέσουμε το OnItemRemoved για να ενημερωθεί το βάρος και τέλος κοιτάμε αν το container είναι άδειο, αν ναι τότε βάζουμε μπρός την διαδικασία διαγραφής του.
 Σιγουρευόμαστε ότι το καινούριο function καλείτε όταν πατηθεί το κουμπί μέσα στο OnItemDroped μέσα στο InventoryScreen.
 
-```gdscirpt
+```gdscript
 func OnItemDroped() -> void:
 	Inv.RemoveItemFromContainer(SelectedContainer)
 ```
@@ -752,7 +752,10 @@ func OnItemContainerDeselected() -> void:
 
 Το επόμενο βήμα είναι το Inspect, θα ετοιμάσουμε για αυτό το UI για αρχή και μετά θα δούμε πως θα το αναλύσουμε. Θα γίνει κάτι παρόμοιο με το options menu οπότε η εμπειρία θα μας είναι πολύτιμη. Θα χρειαστούμε κάτι απλό, 2 label για το όνομα του αντικειμένου και την περιγραφή, Ενα TextureRect για το εικονίδιο του, και ένα κουμπί για να κλείνουμε το παράθυρο.  
 
-<img src="/assets/images/DropOption.gif" alt="Alt text" width="600" />
+<img src="/assets/images/InspectMenu.jpg" alt="Alt text" width="600" />
+<img src="/assets/images/InspectionVisuals.jpg" alt="Alt text" width="600" />
+
+Το script θα στυθεί κάπως έτσι, το μόνο που χρειαζόμαστε είναι ένα function για να περνάμε το αντικείμενο που θα κάνουμε inspect και μέσα του θα κάνουμε configure όλες τις πληροφορίες του. Και τέλος ένα function που θα καλεί το κουμπί για να κλείνει αυτό το παράθυρο.
 
 ```gdscript
 extends Control
@@ -766,3 +769,16 @@ class_name InventoryScreen
 @export var Inv : Inventory
 @export var InventoryDescriptorScene : PackedScene
 ```
+
+Τέλος μέσα στο OnItemInspected που βρίσκεται μέσα στο Inventory Screen θα δημιουργούμε το scene αυτό και θα του περνάμε τα data.
+
+```gdscript
+func OnItemInspected() -> void:
+	var Inspector = InventoryDescriptorScene.instantiate() as InspectMenu
+	Inspector.SetItem(SelectedContainer.GetContainedItem())
+	add_child(Inspector)
+```
+
+Τεστάρουμε και βλέπουμε οτι όλα δουλεύουν όπως πρέπει.
+
+<img src="/assets/images/OptionMenuGif.gif" alt="Alt text" width="600" />
