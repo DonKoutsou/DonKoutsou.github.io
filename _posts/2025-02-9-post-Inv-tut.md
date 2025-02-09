@@ -9,7 +9,7 @@ tags:
   - standard
 ---
 
-GIT REPO : https://github.com/DonKoutsou/Inventory_Tutorial
+GIT REPO : `link: https://github.com/DonKoutsou/Inventory_Tutorial`
 
 Ένα από τα συχνότερα συστήματα που θα βρει κάποιος μέσα στα video game είναι το inventory system, αλλιώς η τσάντα. Έχει πολλές μορφές, από απλές λίστες αντικειμένων όπως τα Pokemon, μέχρι κάτι πιο ανεπτυγμένο σαν το DayZ που κοντεύει τα όρια του τέτρις. 
 Αγαπημένο σύστημα από πολλούς, αλλά και μισητό από πολλους άλλους. Άτομα επιλέγουν ορισμένες φορές να το αγνοούν λόγω άβολων χειρισμών ή άχρηστης πολυπλοκότητας.
@@ -30,3 +30,32 @@ GIT REPO : https://github.com/DonKoutsou/Inventory_Tutorial
 -Κατανάλωση ή consume 
 -άφησε ή drop
 -άκυρο cancel
+
+Έχοντας αυτά τα στοιχεία μαζί μέρα, πλέον γνωρίζουμε 
+πώς να ορίσουμε ένα αντικείμενο και πώς αυτό θα επιδρά με το σύστημα 
+πόσο UI θα χρειαστούμε 
+πώς τα εξωτερικά συστήματα θα επικοινωνούν με το Inventory
+
+Θα ξεκινήσουμε το προγραμματισμό ορίζοντας τι είναι ένα αντικείμενο. Δημιουργούμε τους πρώτους φακέλους και το script που θα ορίζει το αντικείμενο.
+```gdscript
+extends Resource
+
+class_name Item
+
+@export var _ItemName : String
+@export var _ItemDescription : String
+@export var _ItemWeight : float
+@export var _ItemIcon : Texture
+
+func GetItemName() -> String:
+	return _ItemName
+
+func GetItemDescription() -> String:
+	return _ItemDescription
+
+func GetItemWeight() -> float:
+	return _ItemWeight
+
+func CanStack() -> bool:
+	return true
+`
