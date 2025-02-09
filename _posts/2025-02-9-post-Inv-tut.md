@@ -60,3 +60,48 @@ func GetItemWeight() -> float:
 func CanStack() -> bool:
 	return true
 ```
+Το script του Item θα συνταχθεί κάπως έτσι για αρχή και μετά μπορούμε να το επεκτείνουμε.
+{: .notice}
+Για αρχή το script θα κάνει inherit από την κλάση Resource. Ο λόγος αυτού είναι οτι αυτή η κλάση θα υπάρχει για αναπαριστά δεδομένα και τίποτε άλλο, όπως αναφέρεται και στα doc τα resources είναι data containers, οταν κάποιο στιγμή θελήσουμε να αναπαραστήσουμε ένα αντικείμενο σε μιά σκηνή τότε θα δημιουργήσουμε μια άλλη κλάση που θα κάνει Inherit από node.
+Τα “underscore” ( _ ) που τοποθετούνται πριν τα ονόματα των variable είναι για δική μου εξυπηρέτηση, έτσι σημαδεύω τα private variable μιας και το gdScript δεν έχει private variable.
+Για λόγους οργάνωσης θέλω να σιγουρευτώ οτι η πρόσβαση/αλλαγή δεδομένων θα γίνεται μέσω function, για αυτόν τον λόγο έχω στήσει και τα πρώτα μου Getter, δηλαδή function που θα μου επιστρέφουν τα variable αυτής της κλάσης.
+Το function CanStack θα μας χρησιμεύσει αργότερα. Θα μπορέσουμε να κάνουμε override αυτό το function και έτσι να επιτράπουμε ή να αποτρέπουμε σε ορισμένα αντικείμενα να κάνουν stack μέσα στο inventory. Όταν λέμε stack εννοούμε οτι μέσα στο Inventory θα μας δείχνει οτι έχουμε 4χ από ένα αντικείμενο.
+Μία πολύτιμη δυνατότητα της χρήσης των Getter είναι οτι σε κλάσεις που επεκτείνουν το Item θα μπορούμε να κάνουμε override την συμπεριφορά τους και να προσθέσουμε έξτρα πληροφορίες.
+{: .notice}
+Για παράδειγμα, χτίζουμε την κλάση ContainerItem η οποία θα αναπαριστά τα αντικείμενα που θα έχουν περιεχόμενο (μπουκάλι με νερό) όπως ορίσαμε και στο αρχικό design.
+```gdscript
+extends Item
+
+class_name ContainerItem
+
+@export var _ContentName : String
+@export var _Capacity : float
+@export var _CurrentContetAmmount : float
+
+func GetItemDescription() -> String:
+	return "{0} | {1}/{2} of {3}".format([_ItemDescription, _CurrentContetAmmount, _Capacity, _ContentName])
+
+func GetContentName() -> String:
+	return _ContentName
+
+func GetContentCapacity() -> float:
+	return _Capacity
+
+func GetContentAmmount() -> float:
+	return _CurrentContetAmmount
+
+func GetItemWeight() -> float:
+	return _ItemWeight + _CurrentContetAmmount
+
+func CanStack() -> bool:
+	return false
+```
+Πρώτον στο Description θα προσθέσουμε και τα περιεχόμενα του αντικειμένου.
+Δεύτερον στο ItemWeight θα προσθέσουμε και το βάρος του περιεχομένου, προς το παρόν ο ορισμός του περιεχομένου είναι πολύ βασικός, αλλά θα τον εξελίξουμε παρακάτω.
+
+Μπορούμε πλέον να δημιουργήσουμε resource με βάση τις κλάσης που μόλις σχεδιάσαμε και να αρχίσουμε να δημιουργούμε τα αντικείμενα που μπορεί να θέλαμε στο παιχνίδι μας.
+```html
+<img src="/assets/images/Logo.jpg" alt="Alt text" width="600" />
+```
+
+
