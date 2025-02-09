@@ -276,36 +276,26 @@ func GetItemIcon() -> Texture:
 
 Το script του θα είναι κάπως έτσι. 
 {: .notice}
-<div style="display: flex; justify-content: space-between;">
-  <div >
-    <pre>
-      <code>
-        ```gdscript
-        extends PanelContainer
+```gdscript
+extends PanelContainer
 
-        class_name InventoryUIContainer
+class_name InventoryUIContainer
 
-        @export var Icon : TextureRect
-        @export var ItemAmmount : Label
-        @export var ItemName : Label
+@export var Icon : TextureRect
+@export var ItemAmmount : Label
+@export var ItemName : Label
 
-        func RegisterContainer(Cont : InventoryItemContainer) -> void:
-          Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
-          ItemAmmount.text = var_to_str(Cont.GetAmmount())
-          ItemName.text = Cont.GetContainedItem().GetItemName()
-          Icon.texture = Cont.GetContainedItem().GetItemIcon()
+func RegisterContainer(Cont : InventoryItemContainer) -> void:
+	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+	ItemAmmount.text = var_to_str(Cont.GetAmmount())
+	ItemName.text = Cont.GetContainedItem().GetItemName()
+	Icon.texture = Cont.GetContainedItem().GetItemIcon()
 
-        func OnAmmountUpdated(Amm : int) -> void:
-          ItemAmmount.text = var_to_str(Amm)
-       ```
-      </code>
-    </pre>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
-    Θα συνδεθούμε στο Signal που στήσαμε στο InventoryItemContainer για να ενημερώνουμε το UI για αλλαγές στην ποσότητα αυτής την στήβας.
-  </div>
-</div>
+func OnAmmountUpdated(Amm : int) -> void:
+	ItemAmmount.text = var_to_str(Amm)
+```
+Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
+Θα συνδεθούμε στο Signal που στήσαμε στο InventoryItemContainer για να ενημερώνουμε το UI για αλλαγές στην ποσότητα αυτής την στήβας.
 
 Το inventory screen θα είναι και αυτό απλό, θέλουμε απλά να δημιουργήσουμε την λίστα στην οποία θα μπορούν να στοιχιστούν τα UI element που φτιάξαμε προηγουμένως.
 
@@ -321,3 +311,101 @@ func GetItemIcon() -> Texture:
   </div>
 </div>
 
+Το script του Inventory screen θα είναι κάπως έτσι.
+
+```gdscript
+extends Control
+
+class_name InventoryScreen
+
+@export var WeightText : Label
+@export var ContainerPlacement : Control
+@export var InventoryContainerScene : PackedScene
+@export var Inv : Inventory
+
+func _ready() -> void:
+	Inv.connect("ContainerCreated", OnContainerCreated)
+	Inv.connect("OnWeightChanged", OnWeightUpdated)
+	OnWeightUpdated(Inv.GetCurrentWeight())
+
+func OnContainerCreated(Cont : InventoryItemContainer) -> void:
+	var UIContainer = InventoryContainerScene.instantiate() as InventoryUIContainer
+	UIContainer.RegisterContainer(Cont)
+	ContainerPlacement.add_child(UIContainer)
+
+func OnWeightUpdated(NewW : float) -> void:
+	WeightText.text = "Weight : {0} / {1}".format([NewW, Inv.MaxWeight])
+
+func _input(event: InputEvent) -> void:
+	if (event.is_action_pressed("Inventory")):
+		visible = !visible
+```
+Χρησιμοποιούμε το @export για να κάνουμε configure τα διαφορετικά UI element, την σκηνή που φτιάξαμε για να αναπαραστήσουμε το container και τέλος το Inventory.
+
+<img src="/assets/images/PlayerInventory.jpg" alt="Alt text" width="600" />
+
+Το Inventory είναι resource οπότε μπορούμε να το διμιουργήσουμε μέσα στο project μας και να το τοποθετήσουμε όπου το χρειαζώμαστε.
+Μέσα στο _ready function θα συνδεθούμε στα signal που ορίσαμε στο Inventory και θα κάνουμε update το value του weight.
+Ένα function που θα δέχεται τα input και θα κρύβει ή θα δείχνει το Inventory
+Και άλλο ένα το οποίο θα χρησιμοποιείται από το inventory όταν κάποια καινούργια στοίβα δημιουργείται.
+
+
+<img src="/assets/images/CondifuredInvUI.jpg" alt="Alt text" width="600" />
+Σιγουρευόμαστε ότι έχουμε κάνει configure τα πάντα και συνεχίζουμε.
+{: .notice}
+
+Θα κάνουμε configure το Input που βάλαμε στο InventoryScreen για να ανοιγοκλείνει το UI και μπορούμε πλέον να τεστάτουμε το Inventory. Παίζοντας την σκηνή του InventoryScreen, μπορούμε να δούμε οτι το UI αντιδρά στο Input και οτι το weight κάνει update με βάση το τι κάναμε configure στο PlayerInventory.tres
+
+Η βάση του Inventory έχει χτιστεί πλέον και μπορούμε να αρχίσουμε να το συνδέουμε σε ένα παιχνίδι.
+Θα χτίσω κάτι γρήγορο για να το τεστάρω.
+
+
+<img src="/assets/images/ItemH.jpg" alt="Alt text" width="600" />
+Θα χρειαστούμε μια αναπαράσταση του αντικειμένου στον κόσμο, αφού θα φτιάξουμε κάτι γρήγορο, το πιό εύκολο είναι το 2D.
+Η σύνθεσή του θα είναι απλή. Ένα sprite για να βάζουμε το texture του, θα χρησιμοποιήσουμε collision για να βλέπουμε πότε είμαστε πάνω από ένα αντικείμενο για να το τοποθετήσουμε στην τσάντα οπότε ο χαρακτήρας θα χρειαστεί και ένα Area2D.
+```gdscript
+extends Node2D
+
+class_name Item2D
+
+@export var ItemSprite : Sprite2D
+
+var ItemResource : Item
+
+func SetItem(It : Item) -> void:
+	ItemResource = It
+	ItemSprite.texture = It.GetItemIcon()
+
+func GetItemResource() -> Item:
+	return ItemResource
+```
+
+<img src="/assets/images/CharacterH.jpg" alt="Alt text" width="600" />
+
+```gdscript
+extends Node2D
+
+class_name Character
+
+@export var Speed : float
+@export var Inv : Inventory
+
+func _physics_process(delta: float) -> void:
+	if (Input.is_action_pressed("MoveUp")):
+		position.y -= Speed
+	if (Input.is_action_pressed("MoveDown")):
+		position.y += Speed
+	if (Input.is_action_pressed("MoveLeft")):
+		position.x -= Speed
+	if (Input.is_action_pressed("MoveRight")):
+		position.x += Speed
+	
+func _on_item_area_area_entered(area: Area2D) -> void:
+	if (area.get_parent() is Item2D):
+		var It = area.get_parent() as Item2D
+		if (Inv.CanFitItem(It.GetItemResource())):
+			Inv.AddItemToInventory(It.GetItemResource())
+			It.queue_free()
+	else : if (area.get_parent() is Interactable):
+		Interactables.append(area.get_parent())
+```
