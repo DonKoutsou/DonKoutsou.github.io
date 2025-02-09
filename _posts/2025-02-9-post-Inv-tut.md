@@ -7,8 +7,9 @@ tags:
   - Post Formats
   - readability
   - standard
----
 link: https://github.com/DonKoutsou/Inventory_Tutorial
+---
+
 GIT REPO : [link](#)
 
 Ένα από τα συχνότερα συστήματα που θα βρει κάποιος μέσα στα video game είναι το inventory system, αλλιώς η τσάντα. Έχει πολλές μορφές, από απλές λίστες αντικειμένων όπως τα Pokemon, μέχρι κάτι πιο ανεπτυγμένο σαν το DayZ που κοντεύει τα όρια του τέτρις. 
@@ -37,7 +38,7 @@ GIT REPO : [link](#)
 πώς τα εξωτερικά συστήματα θα επικοινωνούν με το Inventory
 
 Θα ξεκινήσουμε το προγραμματισμό ορίζοντας τι είναι ένα αντικείμενο. Δημιουργούμε τους πρώτους φακέλους και το script που θα ορίζει το αντικείμενο.
-```c
+```gdscript
 extends Resource
 
 class_name Item
@@ -58,4 +59,4 @@ func GetItemWeight() -> float:
 
 func CanStack() -> bool:
 	return true
-`
+```
