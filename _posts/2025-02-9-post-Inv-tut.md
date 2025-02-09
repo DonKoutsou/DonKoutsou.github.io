@@ -278,24 +278,28 @@ func GetItemIcon() -> Texture:
 {: .notice}
 <div style="display: flex; justify-content: space-between;">
   <div >
-    ```gdscript
-    extends PanelContainer
+    <pre>
+      <code>
+        ```gdscript
+        extends PanelContainer
 
-    class_name InventoryUIContainer
+        class_name InventoryUIContainer
 
-    @export var Icon : TextureRect
-    @export var ItemAmmount : Label
-    @export var ItemName : Label
+        @export var Icon : TextureRect
+        @export var ItemAmmount : Label
+        @export var ItemName : Label
 
-    func RegisterContainer(Cont : InventoryItemContainer) -> void:
-      Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
-      ItemAmmount.text = var_to_str(Cont.GetAmmount())
-      ItemName.text = Cont.GetContainedItem().GetItemName()
-      Icon.texture = Cont.GetContainedItem().GetItemIcon()
+        func RegisterContainer(Cont : InventoryItemContainer) -> void:
+          Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+          ItemAmmount.text = var_to_str(Cont.GetAmmount())
+          ItemName.text = Cont.GetContainedItem().GetItemName()
+          Icon.texture = Cont.GetContainedItem().GetItemIcon()
 
-    func OnAmmountUpdated(Amm : int) -> void:
-      ItemAmmount.text = var_to_str(Amm)
-    ```
+        func OnAmmountUpdated(Amm : int) -> void:
+          ItemAmmount.text = var_to_str(Amm)
+       ```
+      </code>
+    </pre>
   </div>
   <div style="flex: 1; text-align: center;">
     Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
