@@ -276,36 +276,44 @@ func GetItemIcon() -> Texture:
 
 Το script του θα είναι κάπως έτσι. 
 {: .notice}
-```gdscript
-extends PanelContainer
+<div style="display: flex; justify-content: space-between;">
+  <div style="flex: 1; text-align: center;">
+    ```gdscript
+    extends PanelContainer
 
-class_name InventoryUIContainer
+    class_name InventoryUIContainer
 
-@export var Icon : TextureRect
-@export var ItemAmmount : Label
-@export var ItemName : Label
+    @export var Icon : TextureRect
+    @export var ItemAmmount : Label
+    @export var ItemName : Label
 
-func RegisterContainer(Cont : InventoryItemContainer) -> void:
-	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
-	ItemAmmount.text = var_to_str(Cont.GetAmmount())
-	ItemName.text = Cont.GetContainedItem().GetItemName()
-	Icon.texture = Cont.GetContainedItem().GetItemIcon()
+    func RegisterContainer(Cont : InventoryItemContainer) -> void:
+      Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+      ItemAmmount.text = var_to_str(Cont.GetAmmount())
+      ItemName.text = Cont.GetContainedItem().GetItemName()
+      Icon.texture = Cont.GetContainedItem().GetItemIcon()
 
-func OnAmmountUpdated(Amm : int) -> void:
-	ItemAmmount.text = var_to_str(Amm)
-```
-Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
-Θα συνδεθούμε στο Signal που στήσαμε στο InventoryItemContainer για να ενημερώνουμε το UI για αλλαγές στην ποσότητα αυτής την στήβας.
+    func OnAmmountUpdated(Amm : int) -> void:
+      ItemAmmount.text = var_to_str(Amm)
+    ```
+  </div>
+  <div style="flex: 1; text-align: center;">
+    Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
+    Θα συνδεθούμε στο Signal που στήσαμε στο InventoryItemContainer για να ενημερώνουμε το UI για αλλαγές στην ποσότητα αυτής την στήβας.
+  </div>
+</div>
 
 Το inventory screen θα είναι και αυτό απλό, θέλουμε απλά να δημιουργήσουμε την λίστα στην οποία θα μπορούν να στοιχιστούν τα UI element που φτιάξαμε προηγουμένως.
 
 <img src="/assets/images/InventoryScreenUI.jpg" alt="Alt text" width="600" />
 
+Η λίστα άδεια και με μερικά element
 <div style="display: flex; justify-content: space-between;">
   <div style="flex: 1; text-align: center;">
     <img src="/assets/images/InventoryScreenVisualEmpty.jpg" alt="Image 1" style="max-width: 100%; height: auto;">
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="path/to/image2.jpg" alt="Image 2" style="max-width: 100%; height: auto;">
+    <img src="/assets/images/InventoryScreenVisualFilled.jpg" alt="Image 2" style="max-width: 100%; height: auto;">
   </div>
 </div>
+
