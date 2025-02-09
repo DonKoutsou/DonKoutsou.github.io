@@ -381,7 +381,8 @@ func GetItemResource() -> Item:
 ```
 
 <img src="/assets/images/CharacterH.jpg" alt="Alt text" width="600" />
-
+Ένας απλός χαρακτήρας, ένα sprite και το area2D για να ανιχνεύει τα αντικείμενα. Στό script θα του δώσουμε πρόσβαση στο Inventory,  ο χαρακτήρασ θα χρειαστεί κάποια απλά input και την λογική για το collision, οταν το area2D έχρεται σε επαφή με ένα άλλο Area2D κοιτάμε αν είναι αντικείμενο.
+Αν ναι το βάζουμε στο inventory και διαγράφουμε την 2D αναπαράσταση του.
 ```gdscript
 extends Node2D
 
@@ -409,3 +410,5 @@ func _on_item_area_area_entered(area: Area2D) -> void:
 	else : if (area.get_parent() is Interactable):
 		Interactables.append(area.get_parent())
 ```
+
+<img src="/assets/images/OptionMenuGif.gif" alt="Alt text" width="600" />
