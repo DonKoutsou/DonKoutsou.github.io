@@ -8,6 +8,7 @@ tags:
   - readability
   - standard
 link: https://github.com/DonKoutsou/Inventory_Tutorial
+Gameic : https://game-icons.net/
 ---
 
 GIT REPO : [link](#)
@@ -101,7 +102,210 @@ func CanStack() -> bool:
 
 Μπορούμε πλέον να δημιουργήσουμε resource με βάση τις κλάσης που μόλις σχεδιάσαμε και να αρχίσουμε να δημιουργούμε τα αντικείμενα που μπορεί να θέλαμε στο παιχνίδι μας.
 
-<img src="/assets/images/Logo.jpg" alt="Alt text" width="600" />
+<img src="/assets/images/ItemCreation.jpg" alt="Alt text" width="600" />
+
+Αρχίζοντας να κατασκευάζουμε την κλάση του Inventory χτίζουμε τα βασικά στοιχεία για την διαχείριση του βάρους.
+Inventory script
+```gdscript
+extends Resource
+
+class_name Inventory
+
+@export var MaxWeight : float = 40
+
+var _CurrentWeight : float = 0
+
+var _InventoryContents : Array[InventoryItemContainer]
+```
+ItemContainer script
+```gdscript
+extends Resource
+
+class_name InventoryItemContainer
+
+var _StoredItem : Item
+var _Ammount : int = 0
+
+signal OnAmmountUpdated(NewAmmount : int)
+signal OnContainerEmptied
+
+func RegisterItem(It : Item) -> void:
+	_StoredItem = It
+
+func UpdateAmm(Amm : int) -> void:
+	_Ammount += Amm
+	OnAmmountUpdated.emit(_Ammount)
+
+func GetAmmount() -> int:
+	return _Ammount
+	
+func GetContainedItem() -> Item:
+	return _StoredItem
+```
+To inventory θα μπορεί να τοποθετηθεί μέσα σε οποιαδήποτε κλάση που θα χρειαστεί να έχει inventory, από χαρακτήρες, μέχρι chest.
+Θέλοντας να φτιάξουμε μια λίστα από αντικείμενα που να μας δίνει την δυνατότητα να μην κάνουμε stack αντικείμενα το Dictionary είναι εκτός, από την στιγμή που δεν θα μπορέσουμε να βάλουμε 2 ίδα key.
+Για αυτόν τον λόγο θα φτιάξουμε μια καινούρια κλάση που θα δουλέψει σαν ένα μεμονωμένο container για κάθε αντικείμενο που θα θέλουμε να βάλουμε στο inventory.
+Αυτή η κλάση θα είναι σχετικά απλή και θα περιέχει μόνο τα στοιχεία του αντικειμένου που περιέχει,ι την ποσότητα και ένα signal για να ενημερώνει το UI.
+
+```gdscript
+extends Resource
+
+class_name Inventory
+
+@export var MaxWeight : float = 40
 
 
+var _CurrentWeight : float = 0
 
+var _InventoryContents : Array[InventoryItemContainer]
+
+signal ContainerCreated(Cont : InventoryItemContainer)
+signal OnItemUsed(Cont : InventoryItemContainer)
+signal OnItemDropped(It : Item)
+signal OnWeightChanged(NewW : float)
+
+func AddItemToInventory(It : Item) -> void:
+	if (It.CanStack()):
+		var ItemContainer = GetContainerForItem(It)
+		if (ItemContainer == null):
+			ItemContainer = InventoryItemContainer.new()
+			ItemContainer.RegisterItem(It)
+			_InventoryContents.append(ItemContainer)
+			ContainerCreated.emit(ItemContainer)
+		ItemContainer.UpdateAmm(1)
+		OnItemAdded(It)
+	else:
+		var ItemContainer = InventoryItemContainer.new()
+		ItemContainer.RegisterItem(It)
+		ItemContainer.UpdateAmm(1)
+		_InventoryContents.append(ItemContainer)
+		ContainerCreated.emit(ItemContainer)
+		OnItemAdded(It)
+
+func OnItemAdded(It : Item) -> void:
+	_CurrentWeight += It._ItemWeight
+	OnWeightChanged.emit(_CurrentWeight)
+
+
+func HasItem(It : Item) -> bool:
+	for g in _InventoryContents:
+		if (g.GetContainedItem().resource_path == It.resource_path):
+			return true
+	return false
+
+func GetContainerForItem(It : Item) -> InventoryItemContainer:
+	for g in _InventoryContents:
+		if (g.GetContainedItem().resource_path == It.resource_path):
+			return g
+	return null
+```
+Έχοντας το container έτοιμο μπορούμε να συνεχίσουμε την δημιουργία του inventory.
+Θα δημιουργήσουμε ένα function που θα χρησιμοποιούμε για να τοποθετούμε αντικείμενα μέσα στο inventory και μερικά “βοηθητικά” function για να ελέγχουμε την κατάσταση του inventory.
+Αφού δεν βάλαμε κάποιο “check” μέσα στο AddItemToInventory function θα πρέπει να θυμόμαστε να ελέγξουμε αν το αντικείμενο θα χωρέσει χρησιμοποιώντας το CanFitItem function πριν προσπαθήσουμε να βάλουμε κάποιο αντικείμενο.
+Τέλος 2 signal που θα χρησιμοποιήσουμε για να ενημερώνουμε το UI.
+
+Θα εμβαθύνουμε λίγο στο function AdditemToInventory για να καταλάβουμε πως λειτουργεί.
+Ξεκινάμε τσεκάροντας αν το αντικείμενο μπορεί να μπει σε στοίβα
+```gdscript
+if (It.CanStack()):
+```
+Αν ναι θα πάμε να δούμε αν υπάρχει κάποιο έτοιμο container χρησιμοποιώντας το GetContainerForItem function, για να τοποθετήσουμε το αντικείμενο μέσα, αν το function επιστρέχει null, σημαίνει οτι δεν υπάρχει και έτσι θα πρέπει φτιάξουμε ένα καινούριο, θα πρέπει να θυμηθούμε να τοποθετησουμε το container στην λίστα μας _InventoryContents
+
+```gdscript
+var ItemContainer = GetContainerForItem(It)
+		if (ItemContainer == null):
+			ItemContainer = InventoryItemContainer.new()
+      ItemContainer.RegisterItem(It)
+			_InventoryContents.append(ItemContainer)
+		ItemContainer.UpdateAmm(1)
+		OnItemAdded(It)
+```
+Αν το αντικείμενο δεν μπορεί να μπει σε στοίβα τότε φτιάχνουμε ένα καινούργιο container.
+```gdscript
+else:
+		var ItemContainer = InventoryItemContainer.new()
+		ItemContainer.RegisterItem(It)
+		ItemContainer.UpdateAmm(1)
+		_InventoryContents.append(ItemContainer)
+		OnItemAdded(It)
+```
+**UI**
+Με το inventory σε καλή κατάσταση μπορούμε να ξεκινήσουμε να στήνουμε το UI.
+Πριν ξεκινήσουμε το UI ας χτίσουμε πρώτα μερικά αντικείμενα για να μπορούμε να να τεστάρουμε το σύστημα.
+Μπορούμε να προμηθευτούμε μερικά εικονίδια για να ξεκινήσουμε από εδώ.
+[Gameic](#)
+
+```gdscript
+extends Resource
+
+class_name Item
+
+@export var _ItemName : String
+@export var _ItemDescription : String
+@export var _ItemWeight : float
+@export var _ItemIcon : Texture
+
+func GetItemName() -> String:
+	return _ItemName
+
+func GetItemDescription() -> String:
+	return _ItemDescription
+
+func GetItemWeight() -> float:
+	return _ItemWeight
+
+func CanStack() -> bool:
+	return true
+	
+func GetItemIcon() -> Texture:
+	return _ItemIcon
+```
+
+Θα προσθέσουμε το εικονίδιο στο script του Item για να μπορέσουμε να το κάνουμε configure.
+Και θα δημιουργήσουμε το πρώτο αντικείμενο
+<img src="/assets/images/ItemRockCondif.jpg" alt="Alt text" width="600" />
+
+Θα ξεκινήσουμε το UI φτιάχνοντας το “Container”.
+{: .notice}
+<img src="/assets/images/ItemContainerH.jpg" alt="Alt text" width="600" />
+<img src="/assets/images/ItemContainerVisual.jpg" alt="Alt text" width="600" />
+
+Το container θα χρησιμοποιείται για την αναπαράσταση κάθε στήβας στο inventory.
+Κάθε φορά που ένα “InventoryItemContainer” θα δημιουργείται στο inventory, θα δημιουργούμε και την αναπαράστασή του στο UI.
+Η σύνθεση του είναι απλή, ένα panel container για background, και 3 αντικείμενα στοιχισμένα, το εικονίδιο, η ποσότητα και το όνομα του αντικειμένου.
+
+Το script του θα είναι κάπως έτσι. 
+{: .notice}
+```gdscript
+extends PanelContainer
+
+class_name InventoryUIContainer
+
+@export var Icon : TextureRect
+@export var ItemAmmount : Label
+@export var ItemName : Label
+
+func RegisterContainer(Cont : InventoryItemContainer) -> void:
+	Cont.connect("OnAmmountUpdated", OnAmmountUpdated)
+	ItemAmmount.text = var_to_str(Cont.GetAmmount())
+	ItemName.text = Cont.GetContainedItem().GetItemName()
+	Icon.texture = Cont.GetContainedItem().GetItemIcon()
+
+func OnAmmountUpdated(Amm : int) -> void:
+	ItemAmmount.text = var_to_str(Amm)
+```
+Θα χρειαστούμε ένα function που θα χρησιμοποιούμε για να κάνουμε “inject” τα data από την στοίβα που θα δημιουργηθεί στο inventory και θα θέλουμε να αναπαραστήσουμε.
+Θα συνδεθούμε στο Signal που στήσαμε στο InventoryItemContainer για να ενημερώνουμε το UI για αλλαγές στην ποσότητα αυτής την στήβας.
+
+Το inventory screen θα είναι και αυτό απλό, θέλουμε απλά να δημιουργήσουμε την λίστα στην οποία θα μπορούν να στοιχιστούν τα UI element που φτιάξαμε προηγουμένως.
+
+<img src="/assets/images/InventoryScreenUI.jpg" alt="Alt text" width="600" />
+
+<div style="display: flex; justify-content: space-between;">
+  <div style="flex: 1; text-align: center;">
+    <img src="/assets/images/InventoryScreenVisualEmpty.jpg" alt="Image 1" style="max-width: 100%; height: auto;">
+  </div>
+  <div style="flex: 1; text-align: center;">
+    <img src="path/to/image2.jpg" alt="Image 2" style="max-width: 100%; height: auto;">
+  </div>
+</div>
