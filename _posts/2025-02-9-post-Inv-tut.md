@@ -277,7 +277,7 @@ func GetItemIcon() -> Texture:
 Το script του θα είναι κάπως έτσι. 
 {: .notice}
 <div style="display: flex; justify-content: space-between;">
-  <div style="flex: 1; text-align: center;">
+  <div >
     ```gdscript
     extends PanelContainer
 
