@@ -17,5 +17,6 @@ permalink: "/tutorials/ZbrushPolygroups"
 | Group Visible     |  Δίνει το ίδιο Polygroup σε όλα το ορατά polygon, μπορούμε να χρησιμοποιήσουμε την ίδια τεχνική με την Διαγραφή προσώπων από παραπάνω για να δίνουμε γρήγορα polygroup εκεί που θέλουμε. |
 | Group Masked |  Χρησιμοποιεί την μασκα για να δημιουργήσει διαφορετικά polygroup. |
 
+<h2>Χρήσημα video</h2>
 
-
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5JM1fb7wnTM?si=JDiyrmMIcc5S6Nv6" frameborder="1" allowfullscreen></iframe>

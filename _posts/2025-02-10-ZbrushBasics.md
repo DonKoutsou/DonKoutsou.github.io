@@ -16,8 +16,9 @@ permalink: "/tutorials/ZbrushBasics"
 <img src="/assets/images/Zbrush/StartUpZbrushh.gif" alt="Alt text" width="800" />
 
 * Επιλογή οποιουδίποτε tool από την λίστα στα δεξιά.
-* Drag στον καμβά για να εμφανίσουμε το μοντέλο
-* Πάτημα του κουμπιού “Make polymesh 3D”
+* Drag στον καμβά για να εμφανίσουμε το μοντέλο.
+* Πάτημα του κουμπιού "T" ή ενεργοποίηση του Edit Mode από το κουμπί του.
+* Πάτημα του κουμπιού “Make polymesh 3D”.
 
 <h2>Save load</h2>
 Κάνοντας save από το Document menu κάνουμε save όλο το project με το Undo history και τις αλλαγές που κάναμε στις ρυθμίσεις, δημιουργεί αρκετά μεγάλο αρχείο.
