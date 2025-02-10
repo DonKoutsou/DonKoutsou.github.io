@@ -70,6 +70,9 @@ author:
     - label: "Itch"
       icon: "fab fa-fw fa-itch-io"
       url: "https://mxpsi.itch.io/"
+    - label: "Discord Server"
+      icon: "fab fa-fw fa-discord"
+      url: "https://discord.gg/Ue2qX7ZU9C"
 
 footer:
   links:
@@ -82,6 +85,9 @@ footer:
     - label: "Itch"
       icon: "fab fa-fw fa-itch-io"
       url: "https://mxpsi.itch.io/"
+    - label: "Discord Server"
+      icon: "fab fa-fw fa-discord"
+      url: "https://discord.gg/Ue2qX7ZU9C"
 defaults:
   # _posts
   - scope:
