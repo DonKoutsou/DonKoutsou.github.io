@@ -700,7 +700,7 @@ func OnItemDroped() -> void:
 
 Όπως μπορούμε να δούμε καταφέρνουμε επιτυχώς να αφαιρέσουμε το αντικείμενο από το inventory αλλά παρατηρούμε ένα “bug” όταν η στοίβα αδειάσει τα option μένουν ακόμη ανοιχτά. Αυτό μπορεί να προκαλέσει περαιτέρω προβλήματα μιάς και τα κουμπιά θα προσπαθούν να εκτελέσουν επιλογές σε container που δεν υπάρχουν πια.
 
-<img src="/assets/images/DropOption.gif" alt="Alt text" width="600" />
+<img src="/assets/images/DropOption.gif" alt="Alt text" width="1200" />
 
 Για να λυθεί αυτό θα χρειαστεί το διαλεγμένο UIcontainer να ενημερώνει το InventoryScreen ότι επρόκειτο να διαγράψει τον εαυτό του και με την σειρά του το Inventory Screen να κλείνει το menu με τα option.
 
@@ -787,4 +787,121 @@ func OnItemInspected() -> void:
 
 Τεστάρουμε και βλέπουμε οτι όλα δουλεύουν όπως πρέπει.
 
-<img src="/assets/images/OptionMenuGif.gif" alt="Alt text" width="600" />
+<img src="/assets/images/OptionMenuGif.gif" alt="Alt text" width="1200" />
+
+<hr>
+Το επόμενο κομμάτι που θα ετημάσουμε είναι το "OnItemUsed". Ο τρόπος που θα το κάνω implement είναι με την χρήση "Interactables" μέσα στον χόρο του παιχνιδιού. Δηλαδή σημεία που όταν ο χαρακτήρας βρήσκετε μέσα στην εμβέλεια α τους ο παίχτης θα μπορεί να χρησημοποιήσει ορισμένα αντικείμενα, τα οποία θα ορίζονται από το "Interactable".
+
+
+Για παράδηγμα ένα "Interactable" θα μπορούσε να είναι ένα κατεστραμένο σπίτι που όταν ο παίχτης μπεί στην εμβέλια του τότε θα μπορεί να χρησημοποιήσει το αντικείμενο "plank" για να το διορθώσει. Αν πατήσει "Use" σε ένα από τα plank στο inventory του τότε αυτό θα καταναλώνεται και το σπίτι θα επισκευάζεται.
+
+Αν ο παίχτης πάει να κάνει "Use" ένα αντικείμενα, χωρίς να έχει interactable ή αν σε κανένα από τα interactable που έχει γύρο του δεν χρειάζεται το αντικείμενο.
+
+<h2>Interacable</h2>
+Ξεκινάμε από το Interactable. Δεν χρειαζόμαστε πολλά, 
+* έναν τρόπο να ξέρουμε πότε ο παίχτης είναι κοντά, θα επιλέξουμε colission για την απλότητα του και θα βάλουμε ένα area2D στην ιεραρχία του.
+* Μία ορατή αναπαράσταση που θα μπορούμε να αλάξουμε όταν πλέον το Interactable χρησημοποιηθει, θα βάλουμε ένα Sprite2D.
+
+<h3>Ιεραρχία</h3>
+<img src="/assets/images/InteractableH.jpg" alt="Alt text" width="600" />
+
+Στο Script θα χρειαστόυμε 
+* Ένα export variable που θα μπορούμε να ορίζουμε το αντικείμενο που θα χρειαστεί αυτό το interactable για να χρησημοποιηθεί.
+* Το καινούριο texture που θα βάλουμε στο Interactable όταν πλέον χρησημοποιηθεί.
+* Ένα boolean που θα σημειόνουμε αν έχει χρησημοποιηθεί.
+* Tο function που θα καλούμε όταν θέλουμε να κάνουμε Interact.
+
+<h3>Script</h3>
+```gdscript
+extends Node2D
+
+class_name Interactable
+
+@export var NeededItem : Item
+@export var TransitionTexture : Texture
+
+var Interacted : bool = false
+
+func Interact() -> void:
+	Interacted = true
+	$Sprite2D.texture = TransitionTexture
+```
+
+Το τελευταίο κομμάτι θα έχει να κάνει με την επηκηνονία του χαρακτήρα με το inventory όταν ένα αντικείμενο χρησιμοποιήτε.
+Μόνο ο χαρακτήρας θα γνωρίζει πότε έχει γύρο του "Interactables" οπότε η λογική θα πρέπει να εκτελείτε από αυτόν.
+
+Θα προσθέσουμε στο script του Character τα εξής.
+* Στο _ready θα συνδεθούμε στο OnItemUsed signal που έχει το Inventory, θα το συνδέσουμε με το καινούριο function TryUseItemFromContainer που θα πέρνει το Container από το signal και θα προσπαθεί να χρσησημοποιήσει το αντικείμενο.
+* Ένα καινούριο Array για να κρατάμε το Interactables στα οποία βρησκόμαστε κοντά.
+* Θα προσθέσουμε τα If στο _on_item_area_area_entered, όταν βρήσκουμε Interactable το βάζουμε στο Array
+* Δημιρουργούμε το _on_item_area_area_exited για να βλέπουμε πότε κάποιο interactable βγήκε από το Range.
+
+<h3>Script</h3>
+```diff
+	extends Node2D
+
+	class_name Character
+
+	@export var Speed : float
+	@export var Inv : Inventory
++	var Interactables : Array[Interactable]
+
+	func _ready() -> void:
+		Inv.connect("OnItemDropped", DropItemToFeet)
++		Inv.connect("OnItemUsed", TryUseItemFromContainer)
+
+	func DropItemToFeet(It : Item) -> void:
+		var ItemSc = Inv.BaseItemScene.instantiate() as Item2D
+		ItemSc.SetItem(It)
+		get_parent().add_child(ItemSc)
+
+	func _physics_process(delta: float) -> void:
+		if (Input.is_action_pressed("MoveUp")):
+			position.y -= Speed
+		if (Input.is_action_pressed("MoveDown")):
+			position.y += Speed
+		if (Input.is_action_pressed("MoveLeft")):
+			position.x -= Speed
+		if (Input.is_action_pressed("MoveRight")):
+			position.x += Speed
+
++	func TryUseItemFromContainer(Cont : InventoryItemContainer) -> void:
++		var It = Cont.GetContainedItem()
++		for g in Interactables:
++			if (g.Interacted):
++				continue
++			if (g.NeededItem.resource_path == It.resource_path):
++				g.Interact()
++				Inv.RemoveItemFromContainer(Cont)
++				return
+		
+	func _on_item_area_area_entered(area: Area2D) -> void:
++		if (area.get_parent() is Item2D):
+			var It = area.get_parent() as Item2D
+			if (Inv.CanFitItem(It.GetItemResource())):
+				Inv.AddItemToInventory(It.GetItemResource())
+				It.queue_free()
++		else : if (area.get_parent() is Interactable):
++			Interactables.append(area.get_parent())
+
+
++	func _on_item_area_area_exited(area: Area2D) -> void:
++		if (area.get_parent() is Interactable):
++			Interactables.erase(area.get_parent())
+```
+
+Για να τελειώσουμε θα βάλουμε το Signal στο Inventory και θα δημηουργήσουμαι ένα function που θα το καλεί.
+
+```gdscript
+signal OnItemUsed(Cont : InventoryItemContainer)
+
+func UseItem(Cont : InventoryItemContainer) -> void:
+	OnItemUsed.emit(Cont)
+```
+Και από το InventoryScreen θα καλούμε αυτό το καινούριο function
+```gdscript
+func OnItemUsed() -> void:
+	Inv.UseItem(SelectedContainer)
+```
+<img src="/assets/images/InteractableShowCase.gif" alt="Alt text" width="1200" />
+
