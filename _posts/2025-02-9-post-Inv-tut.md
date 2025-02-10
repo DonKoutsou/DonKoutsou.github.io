@@ -1,5 +1,5 @@
 ---
-title: "Inventory Tutorial"
+title: "Inventory Tutorial (WIP)"
 excerpt_separator: "<!--more-->"
 categories: Tutorial
 tags: Tutorial Godot

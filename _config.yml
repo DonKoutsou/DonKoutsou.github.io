@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: ΜΧΨ WIKI
+title: WIKI
 email:
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
@@ -57,8 +57,8 @@ plugins:
   - jekyll-include-cache
 
 author:
-  name   : "Koutsou"
-  avatar : "/assets/images/Logo.jpg"
+  name   : "Κουτσουράδης Αντώνης"
+  avatar : "https://cdna.artstation.com/p/users/avatars/001/103/320/large/817940a53389d664f3ce0983ba0bf984.jpg?1549732235"
   
   links:
     - label: "GitHub"
