@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: ΜΧΨ
+title: ΜΧΨ WIKI
 email:
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
@@ -22,7 +22,7 @@ description: >- # this means to ignore newlines until "baseurl:"
 github_username: DonKoutsou
 minimal_mistakes_skin: dark
 search: true
-
+logo: "/assets/images/Logo.jpg"
 # Build settings
 markdown: kramdown
 remote_theme: mmistakes/minimal-mistakes
@@ -30,7 +30,7 @@ remote_theme: mmistakes/minimal-mistakes
 permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
-timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: 
 
 include:
   - _pages
@@ -59,7 +59,7 @@ plugins:
 author:
   name   : "Koutsou"
   avatar : "/assets/images/Logo.jpg"
-  bio    : "Some text"
+  
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
@@ -67,6 +67,9 @@ author:
     - label: "ArtStation"
       icon: "fab fa-fw fa-artstation"
       url: "https://www.artstation.com/koutsou"
+    - label: "Itch"
+      icon: "fab fa-fw fa-itch-io"
+      url: "https://mxpsi.itch.io/"
 
 footer:
   links:
@@ -76,18 +79,21 @@ footer:
     - label: "ArtStation"
       icon: "fab fa-fw fa-artstation"
       url: "https://www.artstation.com/koutsou"
+    - label: "Itch"
+      icon: "fab fa-fw fa-itch-io"
+      url: "https://mxpsi.itch.io/"
 defaults:
   # _posts
   - scope:
       path: ""
       type: posts
     values:
-      layout: single
+      layout: splash
       author_profile: true
-      read_time: true
-      comments: true
-      share: true
-      related: true
+      read_time: false
+      comments: false
+      share: false
+      related: false
   # _pages
   - scope:
       path: "_pages"

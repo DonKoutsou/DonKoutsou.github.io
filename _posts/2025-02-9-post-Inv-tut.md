@@ -1,15 +1,12 @@
 ---
 title: "Inventory Tutorial"
 excerpt_separator: "<!--more-->"
-categories:
-  - Tutorial
-tags:
-  - Tutorial
-link: https://github.com/DonKoutsou/Inventory_Tutorial
-Gameic : https://game-icons.net/
+categories: Tutorial
+tags: Tutorial Godot
+permalink: "/tutorials/InventoryTutorial"
 ---
 
-GIT REPO : [link](#)
+GIT REPO : [GitLink](https://github.com/DonKoutsou/Inventory_Tutorial)
 
 Ένα από τα συχνότερα συστήματα που θα βρει κάποιος μέσα στα video game είναι το inventory system, αλλιώς η τσάντα. Έχει πολλές μορφές, από απλές λίστες αντικειμένων όπως τα Pokemon, μέχρι κάτι πιο ανεπτυγμένο σαν το DayZ που κοντεύει τα όρια του τέτρις. 
 Αγαπημένο σύστημα από πολλούς, αλλά και μισητό από πολλους άλλους. Άτομα επιλέγουν ορισμένες φορές να το αγνοούν λόγω άβολων χειρισμών ή άχρηστης πολυπλοκότητας.
@@ -231,7 +228,7 @@ else:
 Με το inventory σε καλή κατάσταση μπορούμε να ξεκινήσουμε να στήνουμε το UI.
 Πριν ξεκινήσουμε το UI ας χτίσουμε πρώτα μερικά αντικείμενα για να μπορούμε να να τεστάρουμε το σύστημα.
 Μπορούμε να προμηθευτούμε μερικά εικονίδια για να ξεκινήσουμε από εδώ.
-[Gameic](#)
+[Game Icons](https://game-icons.net/)
 
 ```gdscript
 extends Resource
@@ -261,6 +258,7 @@ func GetItemIcon() -> Texture:
 
 Θα προσθέσουμε το εικονίδιο στο script του Item για να μπορέσουμε να το κάνουμε configure.
 Και θα δημιουργήσουμε το πρώτο αντικείμενο
+
 <img src="/assets/images/ItemRockCondif.jpg" alt="Alt text" width="600" />
 
 Θα ξεκινήσουμε το UI φτιάχνοντας το “Container”.
@@ -298,14 +296,21 @@ func OnAmmountUpdated(Amm : int) -> void:
 Το inventory screen θα είναι και αυτό απλό, θέλουμε απλά να δημιουργήσουμε την λίστα στην οποία θα μπορούν να στοιχιστούν τα UI element που φτιάξαμε προηγουμένως.
 
 <img src="/assets/images/InventoryScreenUI.jpg" alt="Alt text" width="600" />
-
-Η λίστα άδεια και με μερικά element
+ 
 <div style="display: flex; justify-content: space-between;">
   <div style="flex: 1; text-align: center;">
-    <img src="/assets/images/InventoryScreenVisualEmpty.jpg" alt="Image 1" style="max-width: 100%; height: auto;">
+	Η λίστα άδεια
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="/assets/images/InventoryScreenVisualFilled.jpg" alt="Image 2" style="max-width: 100%; height: auto;">
+	Kαι με μερικά element
+  </div>
+</div>
+<div style="display: flex; justify-content: space-between;">
+  <div style="flex: 1; text-align: center;">
+    <img src="/assets/images/InventoryScreenVisualEmpty.jpg" alt="Image 1" style="width: 150px; height: auto;">
+  </div>
+  <div style="flex: 1; text-align: center;">
+    <img src="/assets/images/InventoryScreenVisualFilled.jpg" alt="Image 2" style="width: 150px; height: auto;">
   </div>
 </div>
 
@@ -389,6 +394,7 @@ class_name Character
 @export var Speed : float
 @export var Inv : Inventory
 
+#καθορίζουμε την κήνηση του παίχτη με βάση τα Input
 func _physics_process(delta: float) -> void:
 	if (Input.is_action_pressed("MoveUp")):
 		position.y -= Speed
@@ -410,7 +416,7 @@ func _on_item_area_area_entered(area: Area2D) -> void:
 ```
 Θα φτιάξουμε μια σκηνή που όλα θα υπάρξουν μαζί και την ονομάζουμε World (Κόσμος).
 
-<img src="/assets/images/WorldH.gif" alt="Alt text" width="600" />
+<img src="/assets/images/WorldH.jpg" alt="Alt text" width="600" />
 
 Το script του κόσμου θα έχει μια βασική λογική για να έχουμε ένα καλό περιβάλλον να τεστάρουμε το inventory. Θα το βάλουμε να μας κάνει spawn 10 αντικείμενα και να τα μοιράσει γύρο.
 
