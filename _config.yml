@@ -16,9 +16,7 @@
 title: WIKI
 email:
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Ένα μικρό προσοπικό Wiki για την καταγραφή διαφόρων γνώσεων επάνω στο 3D και στην δημιουργία video-game.
 github_username: DonKoutsou
 minimal_mistakes_skin: dark
 search: true
