@@ -29,9 +29,15 @@ permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: 
-
+#teaser: /assets/images/bio-photo.jpg
 include:
   - _pages
+date_format: "%d-%B-%Y"
+
+lunr:
+  search_within_pages: true
+  search_full_content : true
+
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
@@ -71,6 +77,9 @@ author:
     - label: "Discord Server"
       icon: "fab fa-fw fa-discord"
       url: "https://discord.gg/Ue2qX7ZU9C"
+    - label: "Ko-fi"
+      icon: "fas fa-fw fa-coffee"
+      url: "https://ko-fi.com/koutsou"
 
 footer:
   links:
@@ -86,18 +95,30 @@ footer:
     - label: "Discord Server"
       icon: "fab fa-fw fa-discord"
       url: "https://discord.gg/Ue2qX7ZU9C"
+    - label: "Ko-fi"
+      icon: "fas fa-fw fa-coffee"
+      url: "https://ko-fi.com/koutsou"
 defaults:
   # _posts
   - scope:
       path: ""
       type: posts
     values:
-      layout: splash
+      layout: single
       author_profile: true
       read_time: false
       comments: false
       share: false
       related: false
+      tags : true
+      show_date : true
+      toc: true
+        
+      author_profile: true
+      #header:
+      #  overlay_filter: 0.25
+      #  overlay_image: /assets/images/bio-photo.jpg
+      #  caption: "Photo credit: [**Oddworld inhabitants**](http://www.oddworld.com/)"
   # _pages
   - scope:
       path: "_pages"
@@ -105,6 +126,10 @@ defaults:
     values:
       layout: single
       author_profile: true
+      #header:
+      #  overlay_filter: 0.25
+      #  overlay_image: /assets/images/bio-photo.jpg
+      #  caption: "Photo credit: [**Oddworld inhabitants**](http://www.oddworld.com/)"
 
 category_archive:
   type: liquid

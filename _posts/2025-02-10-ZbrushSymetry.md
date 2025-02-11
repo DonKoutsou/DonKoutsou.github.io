@@ -1,15 +1,21 @@
 ---
-title: "Συμμετρία στο Zbrush"
+title: "Συμμετρία"
 categories: Tutorial
-tags: Tutorial Zbrush
+tags: Zbrush
 permalink: "/tutorials/ZbrushSymetry"
+toc_label: "Περιεχόμενα"
+toc_sticky : true
 ---
 
+# Εισαγωγή
+<hr>
 Η συμμετρία είναι ένα από τα πιο χρήσιμα εργαλεία στην γλυπτική έτσι και στο Modeling. Το ΖBrush δίνει αρκετές δυνατότητες για να διατηρούμε συμμετρία στα μοντέλα και να την ανακτούμε αφού χαθεί.
 <hr>
 
 <img src="/assets/images/Zbrush/ZbrushSymetry.gif" alt="Alt text" width="1200" />
 
+# Πλήκτρα
+<hr>
 Για να ενεργοποιήσουμε την συμμετρία μπορούμε να το κάνουμε πιέζοντας το 'Χ' ή πηγαίνοντας το Transform Menu. Προς το τέλος του Menu αυτού θα βρούμε τις ρυθμίσεις για την συμμετρία.
 
 | Ρυθμηση    | Περιγραφή |
@@ -36,13 +42,13 @@ permalink: "/tutorials/ZbrushSymetry"
 Και οι 2 εντολές έχουν από πάνω τους XYZ κουμπιά για να ορίσουμε το axis του καθρεφτισμού.
 {: .notice}
 
-<h2>Mirror and Weld</h2>
-
+# Mirror and Weld
+<hr>
 Προκαλεί καθρέφτισμα στο μοντέλο, δηλαδή η τοπολογία από την μια πλευρά του μοντέλου (με βάση το axis που έχουμε διαλέξει) αντικαθιστά όλη την τοπολογία της άλλης πλευράς προκαλώντας έτσι καθρέφτισμα. Η φορά δεν μπορεί να αλλάξει και για αυτό όταν θέλουμε να πετύχουμε το αντίθετο αποτέλεσμα, κάνουμε ένα σκέτο Mirror πρώτα.
 
 To Mirror and Weld κάνει κεθρεπφτισμό από αριστερά στα δεξιά στο X, από πάνω προς τα κάτω στο Y και από μπρός προς τα πίσω στο Z.
 {: .notice}
 
-<h2>Χρήσημα video</h2>
+# Χρήσημα video
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/448NPbO6n6I?si=SciXud2Lg0J9d0Dv" frameborder="0" allowfullscreen></iframe>
