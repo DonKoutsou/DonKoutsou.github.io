@@ -20,7 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
 github_username: DonKoutsou
 minimal_mistakes_skin: dark
 search: true
-logo: "/assets/images/Logo.jpg"
+logo: "/assets/images/ΜΧΨLogoTrans.png"
 # Build settings
 markdown: kramdown
 remote_theme: mmistakes/minimal-mistakes
@@ -61,8 +61,7 @@ plugins:
   - jekyll-include-cache
 
 author:
-  name   : "Κουτσουράδης Αντώνης"
-  avatar : "https://cdna.artstation.com/p/users/avatars/001/103/320/large/817940a53389d664f3ce0983ba0bf984.jpg?1549732235"
+
   
   links:
     - label: "GitHub"
